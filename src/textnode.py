@@ -17,7 +17,12 @@ class DelimiterType(Enum):
     CODE = "`"
 
 class TextNode:
-    def __init__(self, text, text_type, url = None):
+    def __init__(
+            self,
+            text: str,
+            text_type: TextType,
+            url: str | None = None
+    ):
         self.text = text
         self.text_type = text_type
         self.url = url
@@ -50,7 +55,11 @@ def text_node_to_html_node(text_node: TextNode):
         case _:
             raise Exception("Unrecognized TextType")
 
-def split_nodes_delimiter(old_nodes, delimiter, text_type):
+def split_nodes_delimiter(
+        old_nodes: list,
+        delimiter: DelimiterType,
+        text_type: TextType
+):
     result = []
     for node in old_nodes:
         if delimiter.value not in node.text:
@@ -69,11 +78,11 @@ def split_nodes_delimiter(old_nodes, delimiter, text_type):
 
     return result
 
-def extract_markdown_images(text):
+def extract_markdown_images(text: str):
     pattern = r"(?:!)\[(.*?)\]\((.*?)\)"
     return re.findall(pattern, text)
 
-def extract_markdown_links(text):
+def extract_markdown_links(text: str):
     pattern = r"(?<!\!)\[(.*?)\]\((.*?)\)"
     return re.findall(pattern, text)
 
