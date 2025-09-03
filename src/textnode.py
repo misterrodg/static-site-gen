@@ -1,7 +1,9 @@
 from enum import Enum
 
+from htmlnode import LeafNode
+
 class TextType(Enum):
-    PLAIN = "plain"
+    TEXT = "text"
     BOLD = "bold"
     ITALIC = "italic"
     CODE = "code"
@@ -25,4 +27,20 @@ class TextNode:
 
     def __repr__(self):
         return f"TextNode({self.text}, {self.text_type.value}, {self.url})"
+
+def text_node_to_html_node(text_node: TextNode):
+    text_value = text_node.text
+    match text_node.text_type:
+        case TextType.TEXT:
+            return LeafNode(tag=None,value=text_value)
+        case TextType.BOLD:
+            return LeafNode(tag="b",value=text_value)
+        case TextType.ITALIC:
+            return LeafNode(tag="i",value=text_value)
+        case TextType.CODE:
+            return LeafNode(tag="code",value=text_value)
+        case TextType.LINK:
+            return LeafNode(tag="img",value="",props={"alt": text_value, "url": text_node.url})
+        case _:
+            raise Exception("Unrecognized TextType")
 
