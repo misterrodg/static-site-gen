@@ -1,6 +1,6 @@
 import unittest
 
-from textnode import TextNode, TextType, text_node_to_html_node
+from textnode import DelimiterType, TextNode, TextType, split_nodes_delimiter, text_node_to_html_node
 
 
 class TestTextNode(unittest.TestCase):
@@ -34,6 +34,18 @@ class TestTextNode(unittest.TestCase):
         html_node = text_node_to_html_node(node)
         self.assertEqual(html_node.tag, None)
         self.assertEqual(html_node.value, "This is a text node")
+
+    def test_split_text(self):
+        node = TextNode("This is a **string** value with an **extra** delim.", TextType.TEXT)
+        split_array = split_nodes_delimiter([node],DelimiterType.BOLD,TextType.BOLD)
+        result_array = [
+            TextNode("This is a ", TextType.TEXT),
+            TextNode("string", TextType.BOLD),
+            TextNode(" value with an ", TextType.TEXT),
+            TextNode("extra", TextType.BOLD),
+            TextNode(" delim.", TextType.TEXT)
+        ]
+        self.assertEqual(split_array,result_array)
 
 if __name__ == "__main__":
     unittest.main()
