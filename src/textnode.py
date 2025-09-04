@@ -86,3 +86,50 @@ def extract_markdown_links(text: str):
     pattern = r"(?<!\!)\[(.*?)\]\((.*?)\)"
     return re.findall(pattern, text)
 
+def __handle_sections(
+    node: TextNode,
+    links: list[tuple[str,str]],
+    is_image: bool = False
+):
+    result = []
+    lead_char = ""
+    text_type = TextType.LINK
+    search_text = node.text
+
+    if is_image:
+        lead_char = "!"
+        text_type = TextType.IMAGE
+
+    for i in range(len(links)):
+        link_text, link_url = links[i]
+        sections = search_text.split(f"{lead_char}[{link_text}]({link_url})",1)
+        for j in range(len(sections)):
+            if j % 2 != 0:
+                result.append(TextNode(link_text, text_type, link_url))
+                continue
+            result.append(TextNode(sections[j], TextType.TEXT))
+        search_text = sections[-1]
+    return result
+
+def split_nodes_image(old_nodes: list[TextNode]):
+    result = []
+    for node in old_nodes:
+        image_links = extract_markdown_images(node.text)
+        if len(image_links) == 0:
+            result.append(node)
+            continue
+        new_nodes = __handle_sections(node, image_links, True)
+        result.extend(new_nodes)
+    return result
+
+def split_nodes_link(old_nodes: list[TextNode]):
+    result = []
+    for node in old_nodes:
+        links = extract_markdown_links(node.text)
+        if len(links) == 0:
+            result.append(node)
+            continue
+        new_nodes = __handle_sections(node, links)
+        result.extend(new_nodes)
+    return result
+
