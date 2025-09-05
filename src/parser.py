@@ -49,6 +49,13 @@ def __split_ordered_items(block: list[str]) -> list[str]:
 def __clean_code(block: list[str]) -> str:
     return "\n".join([line.strip("```") for line in block if line.strip("```") != ""])
 
+def __text_to_children_single(text: str) -> list[HTMLNode]:
+    result = []
+    text_nodes = text_to_textnode(text)
+    for text_node in text_nodes:
+        result.append(text_node_to_html_node(text_node))
+    return result
+
 def __text_to_children(block: list[str]) -> list[HTMLNode]:
     result = []
     for line in block:
@@ -69,17 +76,19 @@ def __process_quote(block: list[str]) -> ParentNode:
 
 def __process_ul(block: list[str]) -> ParentNode:
     text_list = __split_unordered_items(block)
-    children = __text_to_children(text_list)
-    for child in children:
-        child.value = f"<li>{child.value}</li>"
-    return ParentNode("ul",children)
+    result = []
+    for text in text_list:
+        children = __text_to_children_single(text)
+        result.append(ParentNode("li",children))
+    return ParentNode("ul",result)
 
 def __process_ol(block: list[str]) -> ParentNode:
     text_list = __split_ordered_items(block)
-    children = __text_to_children(text_list)
-    for child in children:
-        child.value = f"<li>{child.value}</li>"
-    return ParentNode("ol",children)
+    result = []
+    for text in text_list:
+        children = __text_to_children_single(text)
+        result.append(ParentNode("li",children))
+    return ParentNode("ol",result)
 
 def __process_code(block: list[str]) -> ParentNode:
     text = __clean_code(block)
