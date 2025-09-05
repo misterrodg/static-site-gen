@@ -5,10 +5,11 @@ from textnode import text_node_to_html_node, text_to_textnode
 import re
 
 def extract_title(markdown: str) -> str:
-    level, result = __clean_heading([markdown])
-    if level != 1:
-        raise Exception("h1 not found")
-    return result
+    lines = markdown.split("\n")
+    for line in lines:
+        if line.startswith("# "):
+            return line.strip("# ")
+    raise Exception("h1 not found")
 
 def markdown_to_blocks(markdown: str):
     text_blocks = markdown.split("\n\n")
