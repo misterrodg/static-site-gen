@@ -63,23 +63,24 @@ def split_nodes_delimiter(
         delimiter: DelimiterType,
         text_type: TextType
 ):
-    for i in range(len(old_nodes)):
-        if delimiter.value not in old_nodes[i].text:
+    new_nodes = []
+    for old_node in old_nodes:
+        if old_node.text_type != TextType.TEXT:
+            new_nodes.append(old_node)
             continue
 
-        split_string = old_nodes[i].text.split(delimiter.value)
+        split_sections = old_node.text.split(delimiter.value)
+        if len(split_sections) % 2 == 0:
+            raise ValueError("invalid markdown, formatted section not closed")
 
-        if len(split_string) % 2 == 0:
-            raise Exception("Closing delimiter not found.")
-
-        new_items = []
-        for j in range(len(split_string)):
-            node_type = text_type
-            if j % 2 == 0:
-                node_type = TextType.TEXT
-            new_items.append(TextNode(split_string[j], node_type))
-        old_nodes[i:i+1] = new_items
-    return old_nodes
+        for i in range(len(split_sections)):
+            if split_sections[i] == "":
+                continue
+            if i % 2 == 0:
+                new_nodes.append(TextNode(split_sections[i], TextType.TEXT))
+            else:
+                new_nodes.append(TextNode(split_sections[i], text_type))
+    return new_nodes
 
 def extract_markdown_images(text: str):
     pattern = r"(?:!)\[(.*?)\]\((.*?)\)"
