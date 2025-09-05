@@ -40,18 +40,23 @@ class LeafNode(HTMLNode):
         self,
         tag: str | None,
         value: str,
-        props: dict | None = None
+        props: dict | None = None,
+        self_close: bool = False
     ):
         super().__init__(tag=tag,value=value,props=props)
+        self.self_close = self_close
 
     def to_html(self):
-        if not self.value:
-            raise ValueError("All leaf nodes must have a value.")
+        if self.value is None and not self.self_close:
+            raise ValueError("Leaf nodes that aren't self-closing must have a value.")
         lead_tag = ""
         trail_tag = ""
         if self.tag:
             lead_tag = f"<{self.tag}{self.props_to_html()}>"
             trail_tag = f"</{self.tag}>"
+        if self.self_close:
+            lead_tag = lead_tag.replace(">","/>")
+            trail_tag = ""
         return f"{lead_tag}{self.value}{trail_tag}"
 
 class ParentNode(HTMLNode):
