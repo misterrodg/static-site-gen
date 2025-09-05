@@ -47,7 +47,12 @@ class LeafNode(HTMLNode):
     def to_html(self):
         if not self.value:
             raise ValueError("All leaf nodes must have a value.")
-        return f"<{self.tag}{self.props_to_html()}>{self.value}</{self.tag}>"
+        lead_tag = ""
+        trail_tag = ""
+        if self.tag:
+            lead_tag = f"<{self.tag}{self.props_to_html()}>"
+            trail_tag = f"</{self.tag}>"
+        return f"{lead_tag}{self.value}{trail_tag}"
 
 class ParentNode(HTMLNode):
     def __init__(
