@@ -1,6 +1,6 @@
 import unittest
 
-from parser import markdown_to_blocks, markdown_to_html_node
+from parser import extract_title, markdown_to_blocks, markdown_to_html_node
 
 class TestParser(unittest.TestCase):
     def test_markdown_to_blocks(self):
@@ -54,4 +54,12 @@ the **same** even with inline stuff
             html,
             "<div><pre><code>This is text that _should_ remain\nthe **same** even with inline stuff</code></pre></div>",
         )
+
+    def test_extract_title(self):
+        md = "# Hello"
+        title = extract_title(md)
+        self.assertEqual(title,"Hello")
+
+        md = "## Hello"
+        self.assertRaises(Exception, extract_title, md)
 
