@@ -10,6 +10,7 @@ class TextType(Enum):
     CODE = "code"
     LINK = "link"
     IMAGE = "image"
+    UNRECOGNIZED = "unrecognized"
 
 class DelimiterType(Enum):
     BOLD = "**"
@@ -51,8 +52,10 @@ def text_node_to_html_node(text_node: TextNode):
         case TextType.CODE:
             return LeafNode(tag="code",value=text_value)
         case TextType.LINK:
-            return LeafNode(tag="img",value="",props={"alt": text_value, "url": text_node.url})
-        case _:
+            return LeafNode(tag="a",value=text_value,props={"href": text_node.url})
+        case TextType.IMAGE:
+            return LeafNode(tag="img",value="",props={"alt": text_value, "src": text_node.url},self_close=True)
+        case TextType.UNRECOGNIZED:
             raise Exception("Unrecognized TextType")
 
 def split_nodes_delimiter(
